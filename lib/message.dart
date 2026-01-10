@@ -1,0 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+class Message{
+  final String senderID;
+  final String senderEmail;
+  final String recieverID;
+  final String messageText;
+  final Timestamp time;
+
+
+  Message({
+    required this.senderID,
+    required this.senderEmail,
+    required this.recieverID,
+    required this.messageText,
+    required this.time,
+  });
+
+
+  Map<String, dynamic> toMap(){
+    return {
+      "senderID" : senderID,
+      "senderEmail" : senderEmail,
+      "recieverID" : recieverID,
+      "messageText" : messageText,
+      "time" : time
+    };
+  }
+
+}
