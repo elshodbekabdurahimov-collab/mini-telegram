@@ -41,48 +41,48 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyD4RvmQdusyKNPKWAU_m9GnCdm87kTf4FU',
-    appId: '1:778064361074:web:3835c12c296b91811eb4eb',
-    messagingSenderId: '778064361074',
-    projectId: 'telegram-e5aa0',
-    authDomain: 'telegram-e5aa0.firebaseapp.com',
-    storageBucket: 'telegram-e5aa0.firebasestorage.app',
-    measurementId: 'G-XTSNPPP4J5',
+    apiKey: 'AIzaSyBrsQseMBFc_psOdvsVlWxmedpK5epX5Xc',
+    appId: '1:534905795788:web:93f02d9635cc72bce17e69',
+    messagingSenderId: '534905795788',
+    projectId: 'project123-a6f34',
+    authDomain: 'project123-a6f34.firebaseapp.com',
+    storageBucket: 'project123-a6f34.firebasestorage.app',
+    measurementId: 'G-KVNE62X7SW',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCXnAoMjcFYSBHK2ftymq_GDY3qDq3L2lY',
-    appId: '1:778064361074:android:a7acee57c375365e1eb4eb',
-    messagingSenderId: '778064361074',
-    projectId: 'telegram-e5aa0',
-    storageBucket: 'telegram-e5aa0.firebasestorage.app',
+    apiKey: 'AIzaSyDhx0lQ3oF2TP8xgU2WdKpQfA7ScAGiQ5I',
+    appId: '1:534905795788:android:14c4b3c8c2bd5ce6e17e69',
+    messagingSenderId: '534905795788',
+    projectId: 'project123-a6f34',
+    storageBucket: 'project123-a6f34.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB9Az0iInDOJ_amEGAaQVHo-tuUCfplbBc',
-    appId: '1:778064361074:ios:687cdc2eadcd3edd1eb4eb',
-    messagingSenderId: '778064361074',
-    projectId: 'telegram-e5aa0',
-    storageBucket: 'telegram-e5aa0.firebasestorage.app',
+    apiKey: 'AIzaSyA0aq86u6L7J9Nobo7t-TMbfdUtjurdp2I',
+    appId: '1:534905795788:ios:0ba94808fd6218f1e17e69',
+    messagingSenderId: '534905795788',
+    projectId: 'project123-a6f34',
+    storageBucket: 'project123-a6f34.firebasestorage.app',
     iosBundleId: 'com.example.telegram',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyB9Az0iInDOJ_amEGAaQVHo-tuUCfplbBc',
-    appId: '1:778064361074:ios:687cdc2eadcd3edd1eb4eb',
-    messagingSenderId: '778064361074',
-    projectId: 'telegram-e5aa0',
-    storageBucket: 'telegram-e5aa0.firebasestorage.app',
+    apiKey: 'AIzaSyA0aq86u6L7J9Nobo7t-TMbfdUtjurdp2I',
+    appId: '1:534905795788:ios:0ba94808fd6218f1e17e69',
+    messagingSenderId: '534905795788',
+    projectId: 'project123-a6f34',
+    storageBucket: 'project123-a6f34.firebasestorage.app',
     iosBundleId: 'com.example.telegram',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyD4RvmQdusyKNPKWAU_m9GnCdm87kTf4FU',
-    appId: '1:778064361074:web:2b3d7bb5fa98648d1eb4eb',
-    messagingSenderId: '778064361074',
-    projectId: 'telegram-e5aa0',
-    authDomain: 'telegram-e5aa0.firebaseapp.com',
-    storageBucket: 'telegram-e5aa0.firebasestorage.app',
-    measurementId: 'G-SZJE8FPY39',
+    apiKey: 'AIzaSyBrsQseMBFc_psOdvsVlWxmedpK5epX5Xc',
+    appId: '1:534905795788:web:8cb25458e0ac1d17e17e69',
+    messagingSenderId: '534905795788',
+    projectId: 'project123-a6f34',
+    authDomain: 'project123-a6f34.firebaseapp.com',
+    storageBucket: 'project123-a6f34.firebasestorage.app',
+    measurementId: 'G-L1KW88NWVC',
   );
 }

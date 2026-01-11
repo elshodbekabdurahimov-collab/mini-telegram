@@ -4,15 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:telegram/message.dart';
 
 class ChatService{
-
-  // firebase instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-
-  // hozirgi user kim
-
-  // hamma foydalanuvchi
   Stream<List<Map<String, dynamic>>> getAllUsers() {
     return FirebaseFirestore.instance
         .collection("Users")
@@ -22,7 +15,6 @@ class ChatService{
   }
 
 
-  // xabar jo'natish
   Future<void> sendMessage(String recieverID, message) async {
     final String currentUserId = _auth.currentUser!.uid;
     final String? currentUserEmail = _auth.currentUser!.email;

@@ -1,93 +1,148 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:telegram/auth_service.dart';
+import 'package:telegram/chat_bubble.dart';
+import 'package:telegram/chat_service.dart';
+import 'package:telegram/my_textfield.dart';
 
 class ChatPage extends StatefulWidget {
-  final String chatId;
-  final User currentUser;
+  final String recieverEmail;
+  final String recieverID;
 
-  const ChatPage({super.key, required this.chatId, required this.currentUser});
+  const ChatPage({
+    super.key,
+    required this.recieverEmail,
+    required this.recieverID
+  });
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final TextEditingController _controller = TextEditingController();
+
+  // funksiyalar uchun
+  final _auth = AuthService();
+  final _chat = ChatService();
+
+  // text
+  final _messageController = TextEditingController();
 
   void sendMessage() async {
-    if (_controller.text.trim().isEmpty) return;
-    await FirebaseFirestore.instance
-        .collection('chats')
-        .doc(widget.chatId)
-        .collection('messages')
-        .add({
-      'text': _controller.text.trim(),
-      'senderId': widget.currentUser.uid,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
-    _controller.clear();
+    if(_messageController.text.isNotEmpty){
+      await _chat.sendMessage(
+          widget.recieverID,
+          _messageController.text
+      );
+
+      // xabar jo'natilgandan keyin, xabarni tozalaydi
+      _messageController.clear();
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Chat")),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+            widget.recieverEmail
+        ),
+        centerTitle: true,
+      ),
+
       body: Column(
         children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('chats')
-                  .doc(widget.chatId)
-                  .collection('messages')
-                  .orderBy('timestamp', descending: false)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-                final messages = snapshot.data!.docs;
 
-                return ListView.builder(
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    final msg = messages[index];
-                    final isMe = msg['senderId'] == widget.currentUser.uid;
-                    return Align(
-                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        margin: EdgeInsets.all(5),
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: isMe ? Colors.blue : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          msg['text'],
-                          style: TextStyle(color: isMe ? Colors.white : Colors.black),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+          // hamma xabarlarni ko'rsatish
+          Expanded(
+              child: _messagesList()
           ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(hintText: "Xabar yozing", border: OutlineInputBorder()),
-                  ),
-                ),
-                IconButton(onPressed: sendMessage, icon: Icon(Icons.send)),
-              ],
-            ),
-          ),
+
+          // xabar jo'natish TextField
+          userInput()
         ],
       ),
+    );
+  }
+
+
+  Widget _messagesList(){
+    String senderID = _auth.getCurrentUser()!.uid;
+
+    return StreamBuilder(
+        stream: _chat.getMessages(senderID, widget.recieverID),
+        builder: (context, snapshot){
+          if(snapshot.hasError){
+            return Text("Xatolik...");
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // 3️⃣ data yo‘q
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("Hozircha xabar yo‘q"));
+          }
+
+          // 4️⃣ data bor
+          return ListView(
+            children: snapshot.data!.docs
+                .map((doc) => messageItem(doc))
+                .toList(),
+          );
+        }
+    );
+  }
+
+
+  Widget messageItem(DocumentSnapshot doc){
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+    // hozirgi usermi?
+    bool isCurrentUser =
+        data["senderID"] == _auth.getCurrentUser()!.uid;
+
+    var alignment = isCurrentUser ?
+    Alignment.centerRight : Alignment.centerLeft;
+
+    return Container(
+      alignment: alignment,
+      child: Column(
+        crossAxisAlignment: isCurrentUser ?
+        CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          ChatBubble(
+              message: data["messageText"],
+              isCurrentUser: isCurrentUser
+          )
+        ],
+      ),
+    );
+  }
+
+
+  Widget userInput(){
+    return Row(
+      children: [
+        // textfield
+        Expanded(
+            child: MyTextfield(
+                hinText: "Xabar jo'nating",
+                controller: _messageController,
+                isObscure: false,
+                prefixIcon: Icon(Icons.abc)
+            )
+        ),
+
+        // send tugmacha
+        IconButton(
+            onPressed: sendMessage,
+            icon: Icon(Icons.send_sharp)
+        )
+      ],
     );
   }
 }

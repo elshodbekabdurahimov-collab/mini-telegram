@@ -14,7 +14,6 @@ class _ProfilePageState extends State<ProfilePage> {
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
 
-  // Firebase Auth dan real ma'lumotlarni olish
   User? get _currentUser => FirebaseAuth.instance.currentUser;
 
   String get _fullEmail => _currentUser?.email ?? "Email kiritilmagan";
@@ -22,9 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String get _displayName {
     final email = _fullEmail;
     if (email.contains('@')) {
-      // Emaildan oldingi qismni olamiz va uni chiroyli ismga aylantiramiz
       String namePart = email.split('@')[0];
-      // . ni bo'shliq bilan almashtiramiz va har bir so'zni katta harf bilan boshlaymiz
       return namePart
           .split('.')
           .map((word) => word[0].toUpperCase() + word.substring(1))
@@ -32,10 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     return "Foydalanuvchi";
   }
-
   String get _username => "@${_displayName.toLowerCase().replaceAll(' ', '')}";
-
-  // Rasm tanlash funksiyalari (oldingi koddan bir xil)
   Future<void> _pickImageFromGallery() async {
     try {
       final XFile? pickedFile = await _picker.pickImage(

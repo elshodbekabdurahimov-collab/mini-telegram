@@ -1,93 +1,132 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:telegram/Pages/Home.dart';
 import 'package:telegram/Pages/Register.dart';
+import 'package:telegram/auth_service.dart';
+import 'package:telegram/my_button.dart';
+import 'package:telegram/my_textfield.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+
+  final _emailController = TextEditingController();
+  final _pwController = TextEditingController();
+
+  void showError(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        icon: const Icon(Icons.warning_amber, color: Colors.red),
+        title: const Text("Xatolik"),
+        content: Text(message),
+      ),
+    );
+  }
+
 
   void login() async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+      AuthService authService = AuthService();
+      final credential = await authService.login(
+        _emailController.text.trim(),
+        _pwController.text.trim(),
       );
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => Home(user: credential.user!)),
+        MaterialPageRoute(
+          builder: (context) => HomePage(
+              user: credential.user!
+          ),
+        ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      showError(context, e.toString());
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Center(
-          child: Card(
-            elevation: 10,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("Telegram",
-                  style: TextStyle(
-                    fontSize: 35,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold
-                  ),
-                  ),
-                  SizedBox(height: 20,),
-                  TextField(
-                      controller: emailController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15)
-                        ),
-                          labelText: "Email"
-                      )
-                  ),
-                  SizedBox(height: 10,),
-                  TextField(
-                      controller: passwordController,
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15)
-                          ),
-                          labelText: "Password"
-                      ),
-                      obscureText: true
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                      onPressed: login,
-                      child: Text("Login")
-                  ),
-                  SizedBox(height: 10,),
-                  TextButton(
-                    onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => RegisterPage()
-                        )
-                    ),
-                    child: Text("Don't have an account? Register"),
-                  )
-                ],
-              ),
-            ),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // logo
+          Icon(
+            Icons.restart_alt_outlined,
+            size: 100,
+            color: Colors.blueAccent
           ),
-        ),
+
+          SizedBox(height: 50,),
+          Text(
+            "Qaytib kelganingizdan xursandmiz",
+            style: TextStyle(
+                color: Colors.blueAccent,
+                fontSize: 15
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 25,),
+          MyTextfield(
+            hinText: 'Email kiriting...',
+            controller: _emailController,
+            isObscure: false,
+            prefixIcon: Icon(Icons.email_outlined),
+          ),
+          MyTextfield(
+            hinText: 'Parol kiriting...',
+            controller: _pwController,
+            isObscure: true,
+            prefixIcon: Icon(Icons.lock_outline_rounded),
+          ),
+          SizedBox(height: 20,),
+          MyButton(
+            text: "Kirish",
+            onTap: login,
+          ),
+          SizedBox(height: 25,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Account yo'qmi?",
+                style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 15
+                ),
+              ),
+              SizedBox(width: 5,),
+              GestureDetector(
+                onTap: (){
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RegisterPage()
+                      )
+                  );
+                },
+                child: Text(
+                  "Yangi hisob yarating",
+                  style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent
+                  ),
+                ),
+              )
+            ],
+          )
+        ],
       ),
     );
   }

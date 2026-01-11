@@ -21,7 +21,7 @@ class MyButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(25),
             boxShadow: [
               BoxShadow(
-                  color: Colors.blueAccent,
+                  color: Colors.blue,
                   spreadRadius: 3,
                   blurRadius: 7,
                   offset: Offset(0, 1)
@@ -34,7 +34,7 @@ class MyButton extends StatelessWidget {
           child: Text(
             "$text",
             style: TextStyle(
-                color: Colors.white,
+                color:  Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 18
             ),

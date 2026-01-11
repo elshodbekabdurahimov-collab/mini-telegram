@@ -1,228 +1,305 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:telegram/Pages/Register.dart';
 import 'package:telegram/Pages/chaqiruvlar.dart';
 import 'package:telegram/Pages/hamyon.dart';
 import 'package:telegram/Pages/kontaklar.dart';
 import 'package:telegram/Pages/profile.dart';
 import 'package:telegram/Pages/saqlangan_xabarlar.dart';
+import 'package:telegram/Pages/search.dart';
 import 'package:telegram/Pages/tanishlarni_taklif_qilish.dart';
 import 'package:telegram/Pages/telegram_funksiyalari.dart';
 import 'package:telegram/Pages/yangi_guruh.dart';
+import 'package:telegram/auth_service.dart';
 import 'package:telegram/chat_page.dart';
+import 'package:telegram/chat_service.dart';
+import 'package:telegram/my_usertile.dart';
 
-class Home extends StatefulWidget {
+class HomePage extends StatefulWidget {
   final User user;
-  const Home({super.key, required this.user});
+  const HomePage({
+    super.key,
+    required this.user
+  });
 
   @override
-  State<Home> createState() => _HomeState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomeState extends State<Home> {
+class _HomePageState extends State<HomePage> {
+
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    addUserToFirestore(widget.user);
+    changeSwitcher();
   }
 
-  void addUserToFirestore(User user) async {
-    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-    final doc = await userRef.get();
-    if (!doc.exists) {
-      await userRef.set({
-        'uid': user.uid,
-        'email': user.email,
-        'name': user.email!.split('@')[0],
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-    }
+  final ChatService _chatService = ChatService();
+  final AuthService _authService = AuthService();
+
+  bool isSwitched = false;
+
+  void changeSwitcher() async {
+    final miya = await SharedPreferences.getInstance();
+    setState(() {
+      isSwitched = miya.getBool("isLight") ?? false;
+    });
+  }
+
+  void logout(){
+    AuthService authService = AuthService();
+    authService.logout();
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => RegisterPage()
+        )
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Telegram"),
-        backgroundColor: Colors.blue,
-      ),
-      drawer: StreamBuilder<DocumentSnapshot>(
-        // hozirgi foydalanuvchining documentini olamiz
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .doc(widget.user.uid)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Drawer(child: Center(child: CircularProgressIndicator()));
-          }
-          final userData = snapshot.data!;
-          final name = userData['name'];
-          final email = userData['email'];
-
-          return Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
+        drawer: Drawer(
+          child: SafeArea(
+            child: Column(
               children: [
                 UserAccountsDrawerHeader(
-                  decoration: BoxDecoration(color: Colors.blue),
-                  accountName: Text(name, style: TextStyle(fontSize: 18)),
-                  accountEmail: Text(email),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent
+                  ),
                   currentAccountPicture: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      name[0].toUpperCase(),
-                      style: TextStyle(fontSize: 30, color: Colors.blue),
+                    backgroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDeHNu6C23GF0pYJyjZZk68H2PF3csWK95vrpp_xbSl1iYLVDeCNJaBc0&s"),
+                    radius: 50,
+                  ),
+                    accountName: Text("Elshodbek"),
+                    accountEmail: Text("elshodbek@gmail.com")
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.person_outline_outlined,
+                  ),
+                  title: Text(
+                    "Profilim",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold
                     ),
                   ),
-                ),
-                ListTile(
-                  leading: Icon(Icons.person_outline),
-                  title: Text("Profilim"),
-                  onTap: () {
+                  onTap: (){
                     Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfilePage()
-                        )
+                        MaterialPageRoute(builder:(context) => ProfilePage())
                     );
-                  },
+                  }
                 ),
                 ListTile(
-                  leading: Icon(Icons.account_balance_wallet_outlined),
-                  title: Text("Hamyon"),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Hamyon()
-                        )
-                    );
-                  },
+                    leading: Icon(
+                      Icons.account_balance_wallet_outlined,
+                    ),
+                    title: Text(
+                      "Hamyon",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder:(context) => Hamyon())
+                      );
+                    }
                 ),
                 Divider(),
                 ListTile(
-                  leading: Icon(Icons.people_alt_outlined),
-                  title: Text("Yangi guruh"),
-                  onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => YangiGuruh())
-                    );
-                  },
+                    leading: Icon(
+                      Icons.people_alt_outlined,
+                    ),
+                    title: Text(
+                      "Yangi guruh yaratish",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder:(context) => YangiGuruh())
+                      );
+                    }
                 ),
                 ListTile(
-                  leading: Icon(Icons.person_outline_outlined),
-                  title: Text("Kontaklar"),
-                  onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Kontaklar())
-                    );
-                  },
+                    leading: Icon(
+                      Icons.contact_page_outlined,
+                    ),
+                    title: const Text(
+                      "Kontaktlar",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder:(context) => Kontaklar())
+                      );
+                    }
                 ),
                 ListTile(
-                  leading: Icon(Icons.phone_outlined),
-                  title: Text("Chaqiruvlar"),
-                  onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Chaqiruvlar())
-                    );
-                  },
+                    leading: Icon(
+                      Icons.phone_outlined,
+                    ),
+                    title: Text(
+                      "Chaqiruvlar",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder:(context) => Chaqiruvlar())
+                      );
+                    }
                 ),
                 ListTile(
-                  leading: Icon(Icons.bookmark_border_rounded),
-                  title: Text("Saqlangan xabarlar"),
-                  onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SaqlanganXabarlar())
-                    );
-                  },
+                    leading: Icon(
+                      Icons.bookmark_border_rounded,
+                    ),
+                    title: Text(
+                      "Saqlangan xabarlar",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder:(context) => SaqlanganXabarlar())
+                      );
+                    }
                 ),
                 ListTile(
-                  leading: Icon(Icons.settings_outlined),
-                  title: Text("Sozlamalar"),
-                  onTap: (){
-                    Navigator.pop(context);
-                  },
+                    leading: Icon(
+                      Icons.settings_outlined,
+                    ),
+                    title: const Text(
+                      "Sozlamalar",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.pop(context);
+                    }
                 ),
                 Divider(),
                 ListTile(
-                  leading: Icon(Icons.person_add_outlined),
-                  title: Text("Tanishlarni taklif qilish"),
-                  onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => TanishlarniTaklifQilish())
-                    );
-                  },
+                    leading: Icon(
+                      Icons.person_add_outlined,
+                    ),
+                    title: Text(
+                      "Tanishlarni taklif qilish",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder:(context) => TanishlarniTaklifQilish())
+                      );
+                    }
                 ),
                 ListTile(
-                  leading: Icon(Icons.question_mark_outlined),
-                  title: Text("Telegram funksiyalari"),
-                  onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => TelegramFunksiyalari())
-                    );
-                  },
+                    leading: Icon(
+                      Icons.question_mark_outlined,
+                    ),
+                    title: Text(
+                      "Telegram funksiyalari",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    onTap: (){
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder:(context) => TelegramFunksiyalari())
+                      );
+                    }
                 ),
               ],
             ),
-          );
-        },
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) return Center(child: CircularProgressIndicator());
-          final users = snapshot.data!.docs.where((doc) => doc['uid'] != widget.user.uid).toList();
+          ),
+        ),
+        appBar: AppBar(
+          backgroundColor: Colors.blueAccent,
+          foregroundColor: Colors.white,
+          title: Text(
+              "Telegram"
+          ),
+          actions: [
+            ElevatedButton.icon(
+                onPressed: (){
+                  Navigator.push(
+                      context, 
+                      MaterialPageRoute(builder: (context) => SearchPage())
+                  );
+                }, 
+                label: Text(""),
+              icon: Icon(Icons.search_outlined),
+            )
+          ],
+        ),
 
-          return ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index];
-              return Card(
-                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Text(
-                      user['name'][0].toUpperCase(),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  title: Text(user['name'], style: TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(user['email']),
-                  trailing: Icon(Icons.message, color: Colors.blue),
-                  onTap: () async {
-                    final chatId = await createChat(widget.user.uid, user['uid']);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => ChatPage(chatId: chatId, currentUser: widget.user)),
-                    );
-                  },
-                ),
-              );
-            },
-          );
-        },
-      ),
+        body: _usersList()
+
     );
   }
 
-  Future<String> createChat(String user1Id, String user2Id) async {
-    final chatId = user1Id + '_' + user2Id;
-    final chatRef = FirebaseFirestore.instance.collection('chats').doc(chatId);
-    final doc = await chatRef.get();
-    if (!doc.exists) {
-      await chatRef.set({
-        'users': [user1Id, user2Id],
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+  Widget _usersList(){
+    return StreamBuilder(
+        stream: _chatService.getAllUsers(),
+        builder: (context, snapshot){
+          if(snapshot.hasError){
+            return Text("Nimadir xatolik ketti");
+          }
+
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return Text("Loading...");
+          }
+
+          return ListView(
+            children: snapshot.data!
+                .map<Widget>((userData) => _userListItem(userData, context))
+                .toList(),
+          );
+        }
+    );
+  }
+
+  Widget _userListItem(Map<String, dynamic> userData, BuildContext context){
+
+    bool isCurrentUser = userData["uid"] == _authService.getCurrentUser()!.uid;
+
+    if(isCurrentUser == false){
+      return MyUsertile(
+          text: userData["email"],
+          onTap: (){
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                      recieverEmail: userData["email"],
+                      recieverID: userData["uid"],
+                    )
+                )
+            );
+          }
+      );
     }
-    return chatId;
+    return Container();
   }
 }

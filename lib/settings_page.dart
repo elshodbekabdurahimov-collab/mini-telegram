@@ -1,30 +1,49 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'theme_provider.dart';
+import 'package:telegram/Themes/theme_provider.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
+  State<SettingsPage> createState() => _SettingsPageState();
+}
 
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Settings"),
+        title: Text(
+          "Settings",
+        ),
+        centerTitle: true,
       ),
-      body: ListView(
-        children: [
-          SwitchListTile(
-            title: const Text("Dark Mode"),
-            subtitle: const Text("Telegram style"),
-            value: themeProvider.isDark,
-            onChanged: (value) {
-              themeProvider.toggleTheme(value);
-            },
-            secondary: const Icon(Icons.dark_mode),
-          ),
-        ],
+
+      body: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: BorderRadius.circular(15)
+        ),
+        margin: EdgeInsets.all(25),
+        padding: EdgeInsets.all(15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // text
+            Text("Dark Mode"),
+
+
+            // Cupertinoda icon
+            CupertinoSwitch(
+                value: context.watch<ThemeProvider>().isDarkMode,
+                onChanged: (value){
+                  context.read<ThemeProvider>().toggle();
+                }
+            )
+          ],
+        ),
       ),
     );
   }

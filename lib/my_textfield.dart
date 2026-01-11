@@ -27,16 +27,16 @@ class MyTextfield extends StatelessWidget {
             hintText: hinText,
             enabledBorder: OutlineInputBorder(
                 borderSide:
-                BorderSide(color: Colors.blueGrey, width: 3)
+                BorderSide(color: Colors.white, width: 3)
             ),
             focusedBorder: OutlineInputBorder(
               borderSide:
-              BorderSide(color: Colors.blueGrey, width: 3),
+              BorderSide(color:  Colors.blue, width: 3),
             ),
-            fillColor: Colors.blueGrey,
+            fillColor:  Colors.white,
             filled: true,
             hintStyle: TextStyle(
-                color: Colors.white,
+                color:  Colors.blue,
                 fontWeight: FontWeight.bold
             )
         ),
